@@ -10,28 +10,33 @@ export default function SpotifySearch({ token }) {
   const initResults = { tracks: { items: [] }, artists: { items: [] }, albums: { items: [] }, playlists: { items: [] } }
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState(initResults)
+  const [loading, setLoading] = useState(false)
+  const debouncedSearchTerm = useDebounce(searchQuery, 500)
   const classes = useStyles()
 
-  useEffect(() => {
-    const searchTracks = async () => {
-      const response = await Axios.get(
-        "https://api.spotify.com/v1/search?q=" + searchQuery + "&type=album,artist,playlist,track",
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+  // TODO Refactor so it can be it's own function without dependecy on SpotifySearch Component
+  const searchTracks = async () => {
+    const response = await Axios.get(
+      "https://api.spotify.com/v1/search?q=" + searchQuery + "&type=album,artist,playlist,track",
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
         }
-      )
-      setSearchResults(response.data)
-    }
+      }
+    )
+    setLoading(false)
+    setSearchResults(response.data)
+  }
 
-    if (searchQuery.length > 2) {
-      searchTracks()
+  useEffect(() => {
+    if (debouncedSearchTerm && debouncedSearchTerm.length > 2) {
+      setLoading(true)
+      searchTracks(debouncedSearchTerm, token)
     } else {
       setSearchResults(initResults)
     }
-  }, [searchQuery])
+  }, [debouncedSearchTerm])
 
   return (
     <div className={classes.contentContainer}>
@@ -48,7 +53,7 @@ export default function SpotifySearch({ token }) {
           {searchResults.tracks.items && searchResults.tracks.items.length > 0 && <h2>Tracks:</h2>}
           <List>
             {searchResults.tracks.items.map(track => (
-              <TrackItem track={track} key={track.uri} />
+              <TrackItem track={track} token={token} key={track.uri} />
             ))}
           </List>
         </Grid>
@@ -79,6 +84,31 @@ export default function SpotifySearch({ token }) {
       </Grid>
     </div>
   )
+}
+
+// Hook to debounce state changes
+function useDebounce(value, delay) {
+  // State and setters for debounced value
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value)
+      }, delay)
+
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is changed ...
+      // .. within the delay period. Timeout gets cleared and restarted.
+      return () => {
+        clearTimeout(handler)
+      }
+    },
+    [value, delay] // Only re-call effect if value or delay changes
+  )
+
+  return debouncedValue
 }
 
 const useStyles = makeStyles(theme => ({
