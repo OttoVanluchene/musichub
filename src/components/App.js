@@ -11,7 +11,9 @@ const App = () => {
     <div className="App">
       {token ? (
         <div>
-          <SpotifySearch token={token} />
+          <div className="contentBody">
+            <SpotifySearch token={token} />
+          </div>
           <SpotifyPlayer token={token} />
         </div>
       ) : (

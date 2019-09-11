@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography"
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious"
 import PlayArrowIcon from "@material-ui/icons/PlayArrow"
 import SkipNextIcon from "@material-ui/icons/SkipNext"
+import PauseIcon from "@material-ui/icons/Pause"
 
 const SpotifyPlayer = props => {
   const [deviceId, setdeviceId] = useState("")
@@ -16,7 +17,8 @@ const SpotifyPlayer = props => {
     trackName: "Track Name",
     artistName: "Artist Name",
     albumName: "Album Name",
-    albumArtUrl: { url: "", height: 0, width: 0 }
+    albumArtUrl: { url: "", height: 0, width: 0 },
+    playing: false
   })
 
   const player = useRef(null)
@@ -62,7 +64,7 @@ const SpotifyPlayer = props => {
     player.on("ready", data => {
       let { device_id } = data
       setdeviceId(device_id)
-      transferPlaybackHere(device_id)
+      //transferPlaybackHere(device_id)
     })
   }
 
@@ -106,30 +108,36 @@ const SpotifyPlayer = props => {
   }
 
   return (
-    <Card className={classes.card}>
-      <div className={classes.details}>
-        <CardContent className={classes.content}>
-          <Typography component="h5" variant="h5">
-            {currentTrack.artistName} - {currentTrack.trackName}
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
-            {currentTrack.albumName}
-          </Typography>
-        </CardContent>
-        <div className={classes.controls}>
-          <IconButton aria-label="previous" onClick={() => onPrevClick()}>
-            {theme.direction === "rtl" ? <SkipNextIcon /> : <SkipPreviousIcon />}
-          </IconButton>
-          <IconButton aria-label="play/pause" onClick={() => onPlayClick()}>
-            <PlayArrowIcon className={classes.playIcon} />
-          </IconButton>
-          <IconButton aria-label="next" onClick={() => onNextClick()}>
-            {theme.direction === "rtl" ? <SkipPreviousIcon /> : <SkipNextIcon />}
-          </IconButton>
+    <div className="spotifyPlayer">
+      <Card className={classes.card}>
+        <div className={classes.details}>
+          <CardMedia className={classes.cover} image={currentTrack.albumArtUrl.url} title={currentTrack.albumName} />
+          <div className={classes.controls}>
+            <IconButton aria-label="previous" onClick={() => onPrevClick()}>
+              <SkipPreviousIcon />
+            </IconButton>
+            <IconButton aria-label="play/pause" onClick={() => onPlayClick()}>
+              {!currentTrack.playing ? (
+                <PlayArrowIcon className={classes.playIcon} />
+              ) : (
+                <PauseIcon className={classes.playIcon} />
+              )}
+            </IconButton>
+            <IconButton aria-label="next" onClick={() => onNextClick()}>
+              <SkipNextIcon />
+            </IconButton>
+          </div>
+          <CardContent className={classes.content}>
+            <Typography component="h5" variant="h5">
+              {currentTrack.artistName} - {currentTrack.trackName}
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              {currentTrack.albumName}
+            </Typography>
+          </CardContent>
         </div>
-      </div>
-      <CardMedia className={classes.cover} image={currentTrack.albumArtUrl.url} title={currentTrack.albumName} />
-    </Card>
+      </Card>
+    </div>
   )
 }
 
@@ -141,19 +149,20 @@ const useStyles = makeStyles(theme => ({
   },
   details: {
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "row"
   },
   content: {
     flex: "1 0 auto"
   },
   cover: {
-    width: 151
+    width: 100
   },
   controls: {
     display: "flex",
     alignItems: "center",
     paddingLeft: theme.spacing(1),
-    paddingBottom: theme.spacing(1)
+    paddingBottom: theme.spacing(1),
+    marginLeft: "auto"
   },
   playIcon: {
     height: 38,

@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from "react"
 import Axios from "axios"
-import { List, ListItem, ListItemText, ListItemAvatar, Avatar } from "@material-ui/core"
+import { List, Grid, Input, Container, makeStyles } from "@material-ui/core"
+import TrackItem from "../UI/TrackItem"
+import ArtistItem from "../UI/ArtistItem"
+import AlbumItem from "../UI/AlbumItem"
+import PlaylistItem from "../UI/PlaylistItem"
 
 export default function SpotifySearch({ token }) {
-  const initResults = { tracks: { items: [] } }
+  const initResults = { tracks: { items: [] }, artists: { items: [] }, albums: { items: [] }, playlists: { items: [] } }
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState(initResults)
+  const classes = useStyles()
 
   useEffect(() => {
     const searchTracks = async () => {
-      const response = await Axios.get("https://api.spotify.com/v1/search?q=" + searchQuery + "&type=track", {
-        headers: {
-          authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
+      const response = await Axios.get(
+        "https://api.spotify.com/v1/search?q=" + searchQuery + "&type=album,artist,playlist,track",
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
         }
-      })
-      console.log(response.data)
+      )
       setSearchResults(response.data)
     }
 
@@ -27,24 +34,58 @@ export default function SpotifySearch({ token }) {
   }, [searchQuery])
 
   return (
-    <div>
-      <h1>Search</h1>
-      <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-      <h2>Search Results:</h2>
-      <List>
-        {searchResults.tracks.items.map(track => {
-          return (
-            <ListItem key={track.uri}>
-              <ListItemAvatar>
-                <Avatar alt={track.album.name} src={track.album.images[1].url} />
-              </ListItemAvatar>
-              <ListItemText>
-                {track.name} - {track.artists[0].name}
-              </ListItemText>
-            </ListItem>
-          )
-        })}
-      </List>
+    <div className={classes.contentContainer}>
+      <Input
+        className={classes.resize}
+        type="search"
+        placeholder="Search"
+        value={searchQuery}
+        onChange={e => setSearchQuery(e.target.value)}
+      />
+
+      <Grid container>
+        <Grid item xs={3}>
+          {searchResults.tracks.items && searchResults.tracks.items.length > 0 && <h2>Tracks:</h2>}
+          <List>
+            {searchResults.tracks.items.map(track => (
+              <TrackItem track={track} key={track.uri} />
+            ))}
+          </List>
+        </Grid>
+        <Grid item xs={3}>
+          {searchResults.artists.items && searchResults.artists.items.length > 0 && <h2>Artists:</h2>}
+          <List>
+            {searchResults.artists.items.map(artist => (
+              <ArtistItem artist={artist} key={artist.uri} />
+            ))}
+          </List>
+        </Grid>
+        <Grid item xs={3}>
+          {searchResults.albums.items && searchResults.albums.items.length > 0 && <h2>Albums:</h2>}
+          <List>
+            {searchResults.albums.items.map(album => (
+              <AlbumItem album={album} key={album.uri} />
+            ))}
+          </List>
+        </Grid>
+        <Grid item xs={3}>
+          {searchResults.playlists.items && searchResults.playlists.items.length > 0 && <h2>playlists:</h2>}
+          <List>
+            {searchResults.playlists.items.map(playlist => (
+              <PlaylistItem playlist={playlist} key={playlist.uri} />
+            ))}
+          </List>
+        </Grid>
+      </Grid>
     </div>
   )
 }
+
+const useStyles = makeStyles(theme => ({
+  contentContainer: {
+    margin: "20px"
+  },
+  resize: {
+    fontSize: 40
+  }
+}))

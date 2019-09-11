@@ -8,3 +8,14 @@ html,
 body {
   height: 100%;
 }
+
+.contentBody {
+  margin-bottom: 100px !important;
+}
+
+.spotifyPlayer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+}
