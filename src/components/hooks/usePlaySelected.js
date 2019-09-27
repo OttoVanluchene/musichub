@@ -1,28 +1,28 @@
-import React, { useEffect, useState } from "react"
-import Axios from "axios"
+import { useEffect, useState } from "react";
+import Axios from "axios";
 
+// TODO BUG? usePlaySelected gets created for each track / artists / album / playlist
+// is this normal?
 export default function usePlaySelected() {
-  const [data, setData] = useState({ token: "", uris: null, context_uri: null })
-
-  const sendSelectedTrack = async () => {
-    console.log(data)
-    await Axios.put(
-      "https://api.spotify.com/v1/me/player/play",
-      { uris: data.uris },
-      {
-        headers: {
-          authorization: `Bearer ${data.token}`,
-          "Content-Type": "application/json"
-        }
-      }
-    )
-  }
+  const [data, setData] = useState({ token: "", uris: null, context_uri: null });
 
   useEffect(() => {
-    if (data.uris !== null) {
-      sendSelectedTrack()
-    }
-  }, [data.uris])
+    const sendSelectedTrack = async () => {
+      await Axios.put(
+        "https://api.spotify.com/v1/me/player/play",
+        { uris: data.uris, context_uri: data.context_uri },
+        {
+          headers: {
+            authorization: `Bearer ${data.token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    };
 
-  return [setData]
+    console.log(data);
+    sendSelectedTrack();
+  }, [data]);
+
+  return [setData];
 }

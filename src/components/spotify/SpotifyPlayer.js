@@ -1,72 +1,71 @@
-import React, { useRef, useState, useEffect } from "react"
-import { makeStyles, useTheme } from "@material-ui/core/styles"
-import Button from "@material-ui/core/Button"
-import Card from "@material-ui/core/Card"
-import CardContent from "@material-ui/core/CardContent"
-import CardMedia from "@material-ui/core/CardMedia"
-import IconButton from "@material-ui/core/IconButton"
-import Typography from "@material-ui/core/Typography"
-import SkipPreviousIcon from "@material-ui/icons/SkipPrevious"
-import PlayArrowIcon from "@material-ui/icons/PlayArrow"
-import SkipNextIcon from "@material-ui/icons/SkipNext"
-import PauseIcon from "@material-ui/icons/Pause"
+import React, { useRef, useState, useEffect } from "react";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import SkipNextIcon from "@material-ui/icons/SkipNext";
+import PauseIcon from "@material-ui/icons/Pause";
 
 const SpotifyPlayer = props => {
-  const [deviceId, setdeviceId] = useState("")
+  const [deviceId, setdeviceId] = useState("");
   const [currentTrack, setCurrentTrack] = useState({
     trackName: "Track Name",
     artistName: "Artist Name",
     albumName: "Album Name",
     albumArtUrl: { url: "", height: 0, width: 0 },
     playing: false
-  })
+  });
 
-  const player = useRef(null)
-  const classes = useStyles()
-  const theme = useTheme()
+  const player = useRef(null);
+  const classes = useStyles();
+  const theme = useTheme();
 
   useEffect(() => {
     if (window.Spotify !== null) {
-      console.log("Token: " + props.token)
+      console.log("Token: " + props.token);
       player.current = new window.Spotify.Player({
         name: "Otto's Spotify Player",
         getOAuthToken: cb => {
-          cb(props.token)
+          cb(props.token);
         }
-      })
-      createEventHandlers(player.current)
-      player.current.connect()
+      });
+      createEventHandlers(player.current);
+      player.current.connect();
     }
     return () => {
-      player.current.disconnect()
-    }
-  }, [props.token])
+      player.current.disconnect();
+    };
+  }, [props.token]);
 
   const createEventHandlers = player => {
     player.on("initialization_error", e => {
-      console.log(e)
-    })
+      console.log(e);
+    });
     player.on("authentication_error", e => {
-      console.log(e)
-    })
+      console.log(e);
+    });
     player.on("account_error", e => {
-      console.log(e)
-    })
+      console.log(e);
+    });
     player.on("playback_error", e => {
-      console.log(e)
-    })
+      console.log(e);
+    });
 
     player.on("player_state_changed", state => {
-      console.log(state)
-      handlePlayerStateChange(state)
-    })
+      console.log(state);
+      handlePlayerStateChange(state);
+    });
 
     player.on("ready", data => {
-      let { device_id } = data
-      setdeviceId(device_id)
-      //transferPlaybackHere(device_id)
-    })
-  }
+      let { device_id } = data;
+      setdeviceId(device_id);
+      transferPlaybackHere(device_id);
+    });
+  };
 
   const transferPlaybackHere = deviceId => {
     fetch("https://api.spotify.com/v1/me/player", {
@@ -79,33 +78,33 @@ const SpotifyPlayer = props => {
         device_ids: [deviceId],
         play: true
       })
-    })
-  }
+    });
+  };
 
   const handlePlayerStateChange = state => {
     if (state !== null) {
-      const { current_track: currentTrack } = state.track_window
+      const { current_track: currentTrack } = state.track_window;
       setCurrentTrack({
         trackName: currentTrack.name,
         artistName: currentTrack.artists.map(artist => artist.name).join(", "),
         albumName: currentTrack.album.name,
         albumArtUrl: currentTrack.album.images[0],
         playing: !state.paused
-      })
+      });
     }
-  }
+  };
 
   const onPrevClick = () => {
-    player.current.previousTrack()
-  }
+    player.current.previousTrack();
+  };
 
   const onPlayClick = () => {
-    player.current.togglePlay()
-  }
+    player.current.togglePlay();
+  };
 
   const onNextClick = () => {
-    player.current.nextTrack()
-  }
+    player.current.nextTrack();
+  };
 
   return (
     <div className="spotifyPlayer">
@@ -138,8 +137,8 @@ const SpotifyPlayer = props => {
         </div>
       </Card>
     </div>
-  )
-}
+  );
+};
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -168,6 +167,6 @@ const useStyles = makeStyles(theme => ({
     height: 38,
     width: 38
   }
-}))
+}));
 
-export default SpotifyPlayer
+export default SpotifyPlayer;

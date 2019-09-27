@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from "react"
-import Axios from "axios"
-import { List, Grid, Input, Container, makeStyles } from "@material-ui/core"
-import TrackItem from "../UI/TrackItem"
-import ArtistItem from "../UI/ArtistItem"
-import AlbumItem from "../UI/AlbumItem"
-import PlaylistItem from "../UI/PlaylistItem"
+import React, { useState, useEffect } from "react";
+import Axios from "axios";
+import { List, Grid, Input, makeStyles } from "@material-ui/core";
+import TrackItem from "../UI/TrackItem";
+import ArtistItem from "../UI/ArtistItem";
+import AlbumItem from "../UI/AlbumItem";
+import PlaylistItem from "../UI/PlaylistItem";
 
 export default function SpotifySearch({ token }) {
-  const initResults = { tracks: { items: [] }, artists: { items: [] }, albums: { items: [] }, playlists: { items: [] } }
-  const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState(initResults)
-  const [loading, setLoading] = useState(false)
-  const debouncedSearchTerm = useDebounce(searchQuery, 500)
-  const classes = useStyles()
+  const initResults = {
+    tracks: { items: [] },
+    artists: { items: [] },
+    albums: { items: [] },
+    playlists: { items: [] }
+  };
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState(initResults);
+  const [loading, setLoading] = useState(false);
+  const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const classes = useStyles();
 
   // TODO Refactor so it can be it's own function without dependecy on SpotifySearch Component
   const searchTracks = async () => {
@@ -24,26 +29,26 @@ export default function SpotifySearch({ token }) {
           "Content-Type": "application/json"
         }
       }
-    )
-    setLoading(false)
-    setSearchResults(response.data)
-  }
+    );
+    setLoading(false);
+    setSearchResults(response.data);
+  };
 
   useEffect(() => {
     if (debouncedSearchTerm && debouncedSearchTerm.length > 2) {
-      setLoading(true)
-      searchTracks(debouncedSearchTerm, token)
+      setLoading(true);
+      searchTracks(debouncedSearchTerm, token);
     } else {
-      setSearchResults(initResults)
+      setSearchResults(initResults);
     }
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm]);
 
   return (
     <div className={classes.contentContainer}>
       <Input
         className={classes.resize}
         type="search"
-        placeholder="Search"
+        placeholder={"Search"}
         value={searchQuery}
         onChange={e => setSearchQuery(e.target.value)}
       />
@@ -61,7 +66,7 @@ export default function SpotifySearch({ token }) {
           {searchResults.artists.items && searchResults.artists.items.length > 0 && <h2>Artists:</h2>}
           <List>
             {searchResults.artists.items.map(artist => (
-              <ArtistItem artist={artist} key={artist.uri} />
+              <ArtistItem artist={artist} token={token} key={artist.uri} />
             ))}
           </List>
         </Grid>
@@ -69,7 +74,7 @@ export default function SpotifySearch({ token }) {
           {searchResults.albums.items && searchResults.albums.items.length > 0 && <h2>Albums:</h2>}
           <List>
             {searchResults.albums.items.map(album => (
-              <AlbumItem album={album} key={album.uri} />
+              <AlbumItem album={album} token={token} key={album.uri} />
             ))}
           </List>
         </Grid>
@@ -77,13 +82,13 @@ export default function SpotifySearch({ token }) {
           {searchResults.playlists.items && searchResults.playlists.items.length > 0 && <h2>playlists:</h2>}
           <List>
             {searchResults.playlists.items.map(playlist => (
-              <PlaylistItem playlist={playlist} key={playlist.uri} />
+              <PlaylistItem playlist={playlist} token={token} key={playlist.uri} />
             ))}
           </List>
         </Grid>
       </Grid>
     </div>
-  )
+  );
 }
 
 /**
@@ -94,22 +99,19 @@ export default function SpotifySearch({ token }) {
  * @param {*} delay
  */
 function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value)
+  const [debouncedValue, setDebouncedValue] = useState(value);
 
-  useEffect(
-    () => {
-      const handler = setTimeout(() => {
-        setDebouncedValue(value)
-      }, delay)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
 
-      return () => {
-        clearTimeout(handler)
-      }
-    },
-    [value, delay] // Only re-call effect if value or delay changes
-  )
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
 
-  return debouncedValue
+  return debouncedValue;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -119,4 +121,4 @@ const useStyles = makeStyles(theme => ({
   resize: {
     fontSize: 40
   }
-}))
+}));
