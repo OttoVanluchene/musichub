@@ -1,5 +1,5 @@
-import React from "react"
-import { authEndpoint, clientId, redirectUri, scopes } from "../../config"
+import React from "react";
+import { authEndpoint, clientId, redirectUri, scopes } from "../../config";
 
 export default function SpotifyAuthenticate() {
   return (
@@ -11,5 +11,5 @@ export default function SpotifyAuthenticate() {
     >
       Login to Spotify
     </a>
-  )
+  );
 }

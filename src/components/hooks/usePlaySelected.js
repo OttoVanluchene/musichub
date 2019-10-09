@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import Axios from "axios";
 
-// TODO BUG? usePlaySelected gets created for each track / artists / album / playlist
-// is this normal?
 export default function usePlaySelected() {
   const [data, setData] = useState({ token: "", uris: null, context_uri: null });
 

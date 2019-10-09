@@ -1,14 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import { Card, CardContent, CardMedia, IconButton, Typography } from "@material-ui/core";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
 import PauseIcon from "@material-ui/icons/Pause";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
+import ShuffleIcon from "@material-ui/icons/Shuffle";
 
 const SpotifyPlayer = props => {
   const [deviceId, setdeviceId] = useState("");
@@ -17,16 +14,15 @@ const SpotifyPlayer = props => {
     artistName: "Artist Name",
     albumName: "Album Name",
     albumArtUrl: { url: "", height: 0, width: 0 },
-    playing: false
+    playing: false,
+    shuffle: false
   });
 
   const player = useRef(null);
   const classes = useStyles();
-  const theme = useTheme();
 
   useEffect(() => {
     if (window.Spotify !== null) {
-      console.log("Token: " + props.token);
       player.current = new window.Spotify.Player({
         name: "Otto's Spotify Player",
         getOAuthToken: cb => {
@@ -56,7 +52,6 @@ const SpotifyPlayer = props => {
     });
 
     player.on("player_state_changed", state => {
-      console.log(state);
       handlePlayerStateChange(state);
     });
 
@@ -83,13 +78,15 @@ const SpotifyPlayer = props => {
 
   const handlePlayerStateChange = state => {
     if (state !== null) {
+      console.log(state);
       const { current_track: currentTrack } = state.track_window;
       setCurrentTrack({
         trackName: currentTrack.name,
         artistName: currentTrack.artists.map(artist => artist.name).join(", "),
         albumName: currentTrack.album.name,
         albumArtUrl: currentTrack.album.images[0],
-        playing: !state.paused
+        playing: !state.paused,
+        shuffle: state.shuffle
       });
     }
   };
@@ -104,6 +101,10 @@ const SpotifyPlayer = props => {
 
   const onNextClick = () => {
     player.current.nextTrack();
+  };
+
+  const onShuffle = () => {
+    //TODO Toggle Shuffle
   };
 
   return (
@@ -124,6 +125,9 @@ const SpotifyPlayer = props => {
             </IconButton>
             <IconButton aria-label="next" onClick={() => onNextClick()}>
               <SkipNextIcon />
+            </IconButton>
+            <IconButton aria-label="Shuffle" onClick={() => onShuffle()}>
+              {currentTrack.shuffle ? <ShuffleIcon color="primary" /> : <ShuffleIcon color="primary" />}
             </IconButton>
           </div>
           <CardContent className={classes.content}>

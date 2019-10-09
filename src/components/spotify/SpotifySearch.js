@@ -5,6 +5,7 @@ import TrackItem from "../UI/TrackItem";
 import ArtistItem from "../UI/ArtistItem";
 import AlbumItem from "../UI/AlbumItem";
 import PlaylistItem from "../UI/PlaylistItem";
+import usePlaySelected from "../hooks/usePlaySelected";
 
 export default function SpotifySearch({ token }) {
   const initResults = {
@@ -17,9 +18,9 @@ export default function SpotifySearch({ token }) {
   const [searchResults, setSearchResults] = useState(initResults);
   const [loading, setLoading] = useState(false);
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
+  const [playSelected] = usePlaySelected();
   const classes = useStyles();
 
-  // TODO Refactor so it can be it's own function without dependecy on SpotifySearch Component
   const searchTracks = async () => {
     const response = await Axios.get(
       "https://api.spotify.com/v1/search?q=" + searchQuery + "&type=album,artist,playlist,track",
@@ -43,6 +44,11 @@ export default function SpotifySearch({ token }) {
     }
   }, [debouncedSearchTerm]);
 
+  function playItem(uri, context_uri) {
+    console.log("Play Item");
+    playSelected({ token: token, uris: uri, context_uri: context_uri });
+  }
+
   return (
     <div className={classes.contentContainer}>
       <Input
@@ -58,7 +64,9 @@ export default function SpotifySearch({ token }) {
           {searchResults.tracks.items && searchResults.tracks.items.length > 0 && <h2>Tracks:</h2>}
           <List>
             {searchResults.tracks.items.map(track => (
-              <TrackItem track={track} token={token} key={track.uri} />
+              <div onClick={() => playItem([track.uri])}>
+                <TrackItem track={track} token={token} key={track.uri} />
+              </div>
             ))}
           </List>
         </Grid>
@@ -66,7 +74,9 @@ export default function SpotifySearch({ token }) {
           {searchResults.artists.items && searchResults.artists.items.length > 0 && <h2>Artists:</h2>}
           <List>
             {searchResults.artists.items.map(artist => (
-              <ArtistItem artist={artist} token={token} key={artist.uri} />
+              <div onClick={() => playItem(null, artist.uri)}>
+                <ArtistItem artist={artist} token={token} key={artist.uri} />
+              </div>
             ))}
           </List>
         </Grid>
@@ -74,7 +84,9 @@ export default function SpotifySearch({ token }) {
           {searchResults.albums.items && searchResults.albums.items.length > 0 && <h2>Albums:</h2>}
           <List>
             {searchResults.albums.items.map(album => (
-              <AlbumItem album={album} token={token} key={album.uri} />
+              <div onClick={() => playItem(null, album.uri)}>
+                <AlbumItem album={album} token={token} key={album.uri} />
+              </div>
             ))}
           </List>
         </Grid>
@@ -82,7 +94,9 @@ export default function SpotifySearch({ token }) {
           {searchResults.playlists.items && searchResults.playlists.items.length > 0 && <h2>playlists:</h2>}
           <List>
             {searchResults.playlists.items.map(playlist => (
-              <PlaylistItem playlist={playlist} token={token} key={playlist.uri} />
+              <div onClick={() => playItem(null, playlist.uri)}>
+                <PlaylistItem playlist={playlist} token={token} key={playlist.uri} />
+              </div>
             ))}
           </List>
         </Grid>
