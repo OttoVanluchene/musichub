@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import { Card, CardContent, CardMedia, IconButton, Typography } from "@material-ui/core";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
 import PauseIcon from "@material-ui/icons/Pause";
@@ -144,7 +144,7 @@ const SpotifyPlayer = props => {
   );
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   card: {
     display: "flex",
     flexDirection: "row",
@@ -163,8 +163,8 @@ const useStyles = makeStyles(theme => ({
   controls: {
     display: "flex",
     alignItems: "center",
-    paddingLeft: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
+    paddingLeft: "10px",
+    paddingBottom: "10px",
     marginLeft: "auto"
   },
   playIcon: {
