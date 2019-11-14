@@ -6,6 +6,7 @@ import PauseIcon from "@material-ui/icons/Pause";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
 import ShuffleIcon from "@material-ui/icons/Shuffle";
+import { borderRadius } from "@material-ui/system";
 
 const SpotifyPlayer = props => {
   const [deviceId, setdeviceId] = useState("");
@@ -148,7 +149,8 @@ const useStyles = makeStyles(() => ({
   card: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    borderRadius: "0px"
   },
   details: {
     display: "flex",

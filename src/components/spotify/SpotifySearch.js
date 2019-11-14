@@ -6,6 +6,7 @@ import AlbumItem from "../UI/AlbumItem";
 import PlaylistItem from "../UI/PlaylistItem";
 import usePlaySelected from "../hooks/usePlaySelected";
 import useSearchSpotify from "../hooks/useSearchSpotify";
+import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 
 export default function SpotifySearch({ token }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,16 +18,15 @@ export default function SpotifySearch({ token }) {
     playSelected({ token: token, uris: uri, context_uri: context_uri });
   };
 
-  console.log(searchResults);
-
   const tracksList = () => {
     return (
       <Grid item xs={3}>
         {searchResults.tracks.items && searchResults.tracks.items.length > 0 && <h2>Tracks:</h2>}
         <List>
           {searchResults.tracks.items.map(track => (
-            <div onClick={() => playItem([track.uri])}>
+            <div className={classes.playIconOnHover} onClick={() => playItem([track.uri])}>
               <TrackItem track={track} token={token} key={track.uri} />
+              <PlayArrowRoundedIcon className={classes.playIcon} style={{ fontSize: 60 }} />
             </div>
           ))}
         </List>
@@ -40,8 +40,9 @@ export default function SpotifySearch({ token }) {
         {searchResults.artists.items && searchResults.artists.items.length > 0 && <h2>Artists:</h2>}
         <List>
           {searchResults.artists.items.map(artist => (
-            <div onClick={() => playItem(null, artist.uri)}>
+            <div className={classes.playIconOnHover} onClick={() => playItem(null, artist.uri)}>
               <ArtistItem artist={artist} token={token} key={artist.uri} />
+              <PlayArrowRoundedIcon className={classes.playIcon} style={{ fontSize: 60 }} />
             </div>
           ))}
         </List>
@@ -55,8 +56,9 @@ export default function SpotifySearch({ token }) {
         {searchResults.albums.items && searchResults.albums.items.length > 0 && <h2>Albums:</h2>}
         <List>
           {searchResults.albums.items.map(album => (
-            <div onClick={() => playItem(null, album.uri)}>
+            <div className={classes.playIconOnHover} onClick={() => playItem(null, album.uri)}>
               <AlbumItem album={album} token={token} key={album.uri} />
+              <PlayArrowRoundedIcon className={classes.playIcon} style={{ fontSize: 60 }} />
             </div>
           ))}
         </List>
@@ -70,8 +72,9 @@ export default function SpotifySearch({ token }) {
         {searchResults.playlists.items && searchResults.playlists.items.length > 0 && <h2>playlists:</h2>}
         <List>
           {searchResults.playlists.items.map(playlist => (
-            <div onClick={() => playItem(null, playlist.uri)}>
+            <div className={classes.playIconOnHover} onClick={() => playItem(null, playlist.uri)}>
               <PlaylistItem playlist={playlist} token={token} key={playlist.uri} />
+              <PlayArrowRoundedIcon className={classes.playIcon} style={{ fontSize: 60 }} />
             </div>
           ))}
         </List>
@@ -114,5 +117,20 @@ const useStyles = makeStyles(() => ({
   },
   resize: {
     fontSize: 40
+  },
+  playIcon: {
+    visibility: "hidden"
+  },
+  playIconOnHover: {
+    display: "flex",
+    direction: "row",
+    justifyContent: "space-around",
+    alignItems: "flex-start",
+    "&:hover": { backgroundColor: "lightgrey", opacity: 0.9, cursor: "pointer" }
+  },
+  "@global": {
+    ".makeStyles-playIconOnHover-4:hover .makeStyles-playIcon-3": {
+      visibility: "visible"
+    }
   }
 }));
